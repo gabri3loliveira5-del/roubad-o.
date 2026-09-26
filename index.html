@@ -1,232 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roubadão AI</title>
+</head>
 
-<title>Roubadão AI</title>
+<body>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <h1>Roubadão AI</h1>
 
-body {
-  margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background:
-    radial-gradient(circle at 20% 10%, #123b72 0%, transparent 30%),
-    radial-gradient(circle at 90% 80%, #102d5c 0%, transparent 30%),
-    #070b14;
-  color: white;
-  min-height: 100vh;
-}
+  <p>Seu assistente de programação</p>
 
-/* TOPO */
+  <textarea id="pedido" placeholder="Digite sua ideia..."></textarea>
 
-header {
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 28px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  background: rgba(7,11,20,.75);
-  backdrop-filter: blur(15px);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
+  <br><br>
 
-.logo-area {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  <button onclick="gerar()">Gerar código</button>
 
-.logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 25px;
-  font-weight: 900;
-  background: linear-gradient(135deg,#1683ff,#5c2cff);
-  box-shadow: 0 0 25px rgba(22,131,255,.4);
-}
+  <p id="resultado"></p>
 
-.nome {
-  font-size: 20px;
-  font-weight: 800;
-}
+  <script>
+    function gerar() {
+      const pedido = document.getElementById("pedido").value;
 
-.status {
-  font-size: 13px;
-  color: #75e6a8;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+      document.getElementById("resultado").textContent =
+        "Pedido recebido: " + pedido;
+    }
+  </script>
 
-.ponto {
-  width: 7px;
-  height: 7px;
-  background: #37e68a;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #37e68a;
-}
-
-/* PRINCIPAL */
-
-main {
-  width: min(1100px, 94%);
-  margin: 55px auto;
-}
-
-/* HERO */
-
-.hero {
-  text-align: center;
-  margin-bottom: 35px;
-}
-
-.badge {
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 30px;
-  background: rgba(30,120,255,.12);
-  border: 1px solid rgba(30,120,255,.3);
-  color: #67aaff;
-  font-size: 13px;
-  margin-bottom: 18px;
-}
-
-.hero h1 {
-  font-size: clamp(38px,7vw,70px);
-  margin: 0;
-  line-height: 1;
-  letter-spacing: -3px;
-}
-
-.gradiente {
-  background: linear-gradient(90deg,#42a5ff,#8c5cff);
-  -webkit-background-clip: text;
-  color: transparent;
-}
-
-.hero p {
-  color: #8995aa;
-  font-size: 17px;
-  margin-top: 18px;
-}
-
-/* PAINEL */
-
-.workspace {
-  background: rgba(15,22,36,.85);
-  border: 1px solid rgba(255,255,255,.09);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow:
-    0 30px 80px rgba(0,0,0,.4),
-    0 0 60px rgba(35,110,255,.08);
-}
-
-/* BARRA */
-
-.workspace-top {
-  padding: 14px 18px;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dots {
-  display: flex;
-  gap: 6px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #526075;
-}
-
-.file {
-  color: #8490a4;
-  font-size: 13px;
-}
-
-/* CHAT */
-
-.chat {
-  min-height: 300px;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.welcome {
-  text-align: center;
-  margin: auto;
-}
-
-.robot {
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 20px;
-  border-radius: 22px;
-  background: linear-gradient(135deg,#1677ff,#713cff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  box-shadow: 0 0 40px rgba(40,110,255,.3);
-}
-
-.welcome h2 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.welcome p {
-  color: #7e8ba0;
-}
-
-/* SUGESTÕES */
-
-.sugestoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.sugestao {
-  background: #121b2b;
-  border: 1px solid #26354d;
-  color: #b8c3d5;
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.sugestao:hover {
-  border-color: #358cff;
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* ÁREA DE TEXTO */
-
-.input-area {
-  padding: 20px;
-  border-top: 1px solid rgba(255,255,255,.07);
-  background: rgba(8,13,
+</body>
+</html>
