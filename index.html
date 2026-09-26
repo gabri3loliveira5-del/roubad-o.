@@ -1,64 +1,232 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
-<title>Roubadão — IA de programação</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Roubadão AI</title>
+
 <style>
-:root{--blue:#1677ff;--bg:#f6f8fc;--text:#101828;--muted:#667085}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
-header{height:64px;background:#fff;border-bottom:1px solid #e6eaf0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:3}
-.brand{display:flex;align-items:center;gap:9px}.logo{width:38px;height:38px;border:2px solid var(--blue);border-radius:11px;display:grid;place-items:center;color:var(--blue);font-size:25px;font-weight:900;background:#fff}.brand b{font-size:18px}.brand small{display:block;color:var(--muted);font-size:11px}
-#status{font-size:11px;color:#667085}.online{color:#079455!important}.btn{border:1px solid #dfe4ec;background:#fff;border-radius:9px;padding:9px 11px;cursor:pointer}
-main{max-width:850px;margin:auto;padding:22px 14px 120px}.hero{text-align:center;margin:7vh auto 28px}.hero .logo{width:72px;height:72px;border-radius:21px;font-size:48px;margin:auto}.hero h1{font-size:29px;margin:16px 0 7px}.hero p{color:var(--muted);margin:0}.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}.chip{background:#fff;border:1px solid #e1e6ee;border-radius:20px;padding:9px 12px;color:#4b5565;cursor:pointer}
-.msg{margin:15px 0}.bubble{max-width:92%;padding:13px 15px;border-radius:15px;line-height:1.5;white-space:pre-wrap}.user{display:flex;justify-content:flex-end}.user .bubble{background:var(--blue);color:white}.ai .bubble{background:#fff;border:1px solid #e2e7ef}.code{background:#101828;color:#e7edf7;padding:14px;border-radius:10px;overflow:auto;white-space:pre;font:13px ui-monospace,SFMono-Regular,monospace}.copy{margin-top:8px;border:0;background:#243247;color:white;padding:8px 11px;border-radius:7px}.composer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e4e8ef;padding:10px max(12px,calc((100% - 850px)/2)) calc(10px + env(safe-area-inset-bottom));z-index:4}.row{display:flex;gap:8px}.composer textarea{flex:1;resize:none;border:1px solid #d9e0ea;border-radius:12px;padding:12px;font:15px inherit;outline:none;min-height:48px;max-height:130px}.send{border:0;background:var(--blue);color:#fff;border-radius:11px;padding:0 15px;font-weight:700}.modal{position:fixed;inset:0;background:#0008;display:none;place-items:center;padding:18px;z-index:10}.box{background:#fff;width:min(430px,100%);border-radius:17px;padding:20px;position:relative}.box h2{margin-top:0}.box label{display:block;font-size:13px;font-weight:700;margin:13px 0}.box input{width:100%;padding:11px;margin-top:6px;border:1px solid #d9e0ea;border-radius:9px}.save{background:var(--blue);color:white;border:0;padding:10px 14px;border-radius:9px}.close{position:absolute;right:12px;top:8px;border:0;background:none;font-size:25px}.note{font-size:12px;color:var(--muted);line-height:1.45}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand"><div class="logo">R</div><div><b>Roubadão</b><small>IA de programação</small></div></div>
-  <div style="display:flex;gap:7px;align-items:center"><span id="status">Verificando IA...</span><button class="btn" id="settings">⚙</button></div>
-</header>
-<main>
-<section class="hero" id="hero">
-<div class="logo">R</div><h1>O que vamos programar?</h1><p>Escreva uma ideia e o Roubadão transforma em código.</p>
-<div class="chips">
-<button class="chip">Crie uma calculadora em Python</button>
-<button class="chip">Faça uma página de login</button>
-<button class="chip">Crie um jogo simples</button>
-</div>
-</section>
-<section id="chat"></section>
-</main>
-<form class="composer" id="form">
-<div class="row"><textarea id="prompt" placeholder="Ex.: crie um site de portfólio..." rows="1"></textarea><button class="send">Gerar</button></div>
-</form>
-<div class="modal" id="modal"><div class="box"><button class="close" id="close">×</button><h2>Roubadão</h2>
-<label>Modo pessoal — senha<input id="pass" type="password" placeholder="Defina uma senha"></label>
-<button class="save" id="save">Salvar</button>
-<p class="note">A senha é guardada somente neste navegador. Esta versão não envia sua senha para um servidor.</p>
-</div></div>
-<script type="module">
-import * as webllm from "https://esm.run/@mlc-ai/web-llm";
-const MODEL="Qwen2.5-Coder-0.5B-Instruct-q4f16_1-MLC";
-let engine=null, cfg=JSON.parse(localStorage.getItem("roubadao_mobile")||"{}");
-const $=s=>document.querySelector(s), chat=$("#chat"), hero=$("#hero");
-function add(text,type="ai",code=false){const d=document.createElement("div");d.className="msg "+type;const b=document.createElement("div");b.className="bubble";if(code){b.innerHTML='<div class="code"></div><button class="copy">Copiar código</button>';b.querySelector(".code").textContent=text;b.querySelector(".copy").onclick=()=>navigator.clipboard.writeText(text)}else b.textContent=text;d.appendChild(b);chat.appendChild(d);window.scrollTo(0,document.body.scrollHeight);return d}
-async function init(){
- try{
-  if(!navigator.gpu){$("#status").textContent="WebGPU não disponível";return}
-  $("#status").textContent="Baixando IA (1ª vez)...";
-  engine=await webllm.CreateMLCEngine(MODEL,{initProgressCallback:p=>{$("#status").textContent="IA "+Math.round(p.progress*100)+"%"}}); 
-  $("#status").textContent="● IA pronta";$("#status").className="online";
- }catch(e){$("#status").textContent="IA indisponível";console.error(e)}
+* {
+  box-sizing: border-box;
 }
-document.querySelectorAll(".chip").forEach(x=>x.onclick=()=>{$("#prompt").value=x.textContent;$("#prompt").focus()});
-$("#settings").onclick=()=>{$("#pass").value=cfg.pass||"";$("#modal").style.display="grid"};
-$("#close").onclick=()=>$("#modal").style.display="none";
-$("#save").onclick=()=>{cfg.pass=$("#pass").value;localStorage.setItem("roubadao_mobile",JSON.stringify(cfg));$("#modal").style.display="none";alert("Configuração salva neste navegador.")};
-$("#form").onsubmit=async e=>{e.preventDefault();const q=$("#prompt").value.trim();if(!q)return;if(!engine){add("A IA ainda não está pronta. Aguarde o carregamento e tente novamente.","ai");return}hero.style.display="none";add(q,"user");$("#prompt").value="";const wait=add("Gerando...","ai");try{const r=await engine.chat.completions.create({messages:[{role:"system",content:"Você é o Roubadão, uma IA de programação. Responda em português. Gere código completo e funcional quando solicitado. Seja direto. Sempre coloque código dentro de blocos markdown com linguagem."},{role:"user",content:q}],temperature:0.2,max_tokens:1200});wait.remove();const ans=r.choices?.[0]?.message?.content||"Sem resposta.";const m=ans.match(/```(?:\\w+)?\\s*([\\s\\S]*?)```/);if(m)add(m[1],"ai",true);else add(ans)}catch(e){wait.querySelector(".bubble").textContent="Erro ao gerar: "+e.message}};
-init();
-</script>
-</body>
-</html>
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background:
+    radial-gradient(circle at 20% 10%, #123b72 0%, transparent 30%),
+    radial-gradient(circle at 90% 80%, #102d5c 0%, transparent 30%),
+    #070b14;
+  color: white;
+  min-height: 100vh;
+}
+
+/* TOPO */
+
+header {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(7,11,20,.75);
+  backdrop-filter: blur(15px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 900;
+  background: linear-gradient(135deg,#1683ff,#5c2cff);
+  box-shadow: 0 0 25px rgba(22,131,255,.4);
+}
+
+.nome {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.status {
+  font-size: 13px;
+  color: #75e6a8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ponto {
+  width: 7px;
+  height: 7px;
+  background: #37e68a;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #37e68a;
+}
+
+/* PRINCIPAL */
+
+main {
+  width: min(1100px, 94%);
+  margin: 55px auto;
+}
+
+/* HERO */
+
+.hero {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 30px;
+  background: rgba(30,120,255,.12);
+  border: 1px solid rgba(30,120,255,.3);
+  color: #67aaff;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+.hero h1 {
+  font-size: clamp(38px,7vw,70px);
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -3px;
+}
+
+.gradiente {
+  background: linear-gradient(90deg,#42a5ff,#8c5cff);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.hero p {
+  color: #8995aa;
+  font-size: 17px;
+  margin-top: 18px;
+}
+
+/* PAINEL */
+
+.workspace {
+  background: rgba(15,22,36,.85);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.4),
+    0 0 60px rgba(35,110,255,.08);
+}
+
+/* BARRA */
+
+.workspace-top {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #526075;
+}
+
+.file {
+  color: #8490a4;
+  font-size: 13px;
+}
+
+/* CHAT */
+
+.chat {
+  min-height: 300px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.welcome {
+  text-align: center;
+  margin: auto;
+}
+
+.robot {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
+  border-radius: 22px;
+  background: linear-gradient(135deg,#1677ff,#713cff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 0 40px rgba(40,110,255,.3);
+}
+
+.welcome h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.welcome p {
+  color: #7e8ba0;
+}
+
+/* SUGESTÕES */
+
+.sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.sugestao {
+  background: #121b2b;
+  border: 1px solid #26354d;
+  color: #b8c3d5;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.sugestao:hover {
+  border-color: #358cff;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ÁREA DE TEXTO */
+
+.input-area {
+  padding: 20px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  background: rgba(8,13,
