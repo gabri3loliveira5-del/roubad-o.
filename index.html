@@ -1,33 +1,165 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roubadão AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roubadão AI</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ color:white;
+ min-height:100vh;
+ background:#070b14;
+ background-image:
+ radial-gradient(circle at 20% 10%,#123b72,transparent 30%),
+ radial-gradient(circle at 80% 80%,#24105c,transparent 30%);
+}
+header{
+ height:70px;
+ padding:0 20px;
+ display:flex;
+ align-items:center;
+ gap:12px;
+ border-bottom:1px solid #263044;
+ background:#090e19;
+}
+.logo{
+ width:42px;height:42px;border-radius:13px;
+ display:flex;align-items:center;justify-content:center;
+ font-size:25px;font-weight:bold;
+ background:linear-gradient(135deg,#1683ff,#713cff);
+}
+h1{font-size:20px;margin:0}
+main{
+ width:min(900px,92%);
+ margin:55px auto;
+}
+.hero{text-align:center;margin-bottom:30px}
+.hero h2{
+ font-size:42px;
+ margin:0 0 12px;
+}
+.hero span{
+ color:#459aff;
+}
+.hero p{color:#8793a8}
+.box{
+ background:#101827;
+ border:1px solid #29364c;
+ border-radius:22px;
+ padding:22px;
+ box-shadow:0 20px 60px #0008;
+}
+textarea{
+ width:100%;
+ height:140px;
+ resize:none;
+ background:#080e19;
+ color:white;
+ border:1px solid #33435d;
+ border-radius:15px;
+ padding:16px;
+ font-size:16px;
+ outline:none;
+}
+textarea:focus{border-color:#2581ff}
+button{
+ width:100%;
+ margin-top:14px;
+ padding:15px;
+ border:0;
+ border-radius:14px;
+ background:linear-gradient(135deg,#1677ff,#683cff);
+ color:white;
+ font-size:16px;
+ font-weight:bold;
+}
+#resultado{
+ display:none;
+ margin-top:20px;
+}
+pre{
+ background:#050912;
+ padding:18px;
+ border-radius:14px;
+ white-space:pre-wrap;
+ color:#d9e5f5;
+}
+.sugestoes{
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px;
+ margin-top:15px;
+}
+.sugestoes button{
+ width:auto;
+ margin:0;
+ padding:9px 12px;
+ background:#182338;
+ font-size:13px;
+}
+</style>
 </head>
 
 <body>
 
+<header>
+  <div class="logo">R</div>
   <h1>Roubadão AI</h1>
+</header>
 
-  <p>Seu assistente de programação</p>
+<main>
 
-  <textarea id="pedido" placeholder="Digite sua ideia..."></textarea>
+  <div class="hero">
+    <h2>Crie qualquer coisa com <span>IA.</span></h2>
+    <p>Descreva sua ideia e transforme-a em código.</p>
+  </div>
 
-  <br><br>
+  <div class="box">
 
-  <button onclick="gerar()">Gerar código</button>
+    <textarea id="pedido"
+      placeholder="Ex: Crie um jogo de corrida em HTML, CSS e JavaScript..."></textarea>
 
-  <p id="resultado"></p>
+    <div class="sugestoes">
+      <button onclick="exemplo('Crie um jogo de plataforma')">🎮 Jogo</button>
+      <button onclick="exemplo('Crie uma página de login')">🔐 Login</button>
+      <button onclick="exemplo('Crie uma loja virtual')">🛒 Loja</button>
+    </div>
 
-  <script>
-    function gerar() {
-      const pedido = document.getElementById("pedido").value;
+    <button onclick="gerar()">✨ Gerar código</button>
 
-      document.getElementById("resultado").textContent =
-        "Pedido recebido: " + pedido;
-    }
-  </script>
+    <div id="resultado">
+      <h3>💻 Resultado</h3>
+      <pre id="codigo"></pre>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+function exemplo(texto){
+ document.getElementById("pedido").value=texto;
+}
+
+function gerar(){
+ const pedido=document.getElementById("pedido").value.trim();
+
+ if(!pedido){
+   alert("Digite o que você quer criar!");
+   return;
+ }
+
+ document.getElementById("resultado").style.display="block";
+
+ document.getElementById("codigo").textContent=
+ "Pedido recebido pelo Roubadão AI:\\n\\n"+pedido+
+ "\\n\\nA conexão com a IA será adicionada na próxima etapa.";
+}
+</script>
 
 </body>
 </html>
